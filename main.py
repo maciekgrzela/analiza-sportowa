@@ -105,9 +105,9 @@ def flatten_list(list_to_flat):
 
 
 for index, name in enumerate(file_names):
-    if index > 9:
-        transfers.append(gather_info_from_file(name))
+    transfers.append(gather_info_from_file(name))
+
 
 transfers = flatten_list(flatten_list(transfers))
 transfers_df = pd.DataFrame(transfers, columns=transfers_columns)
-transfers_df.to_csv('transfers-data-frame-up6.csv', encoding='utf-8')
+transfers_df.to_csv('csv/transfers-data-frame.csv', encoding='utf-8')
