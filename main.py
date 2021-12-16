@@ -21,9 +21,17 @@ transfers_sites_list = [
     'https://www.transfermarkt.pl/liga-portugal-bwin/transfers/wettbewerb/PO1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
     'https://www.transfermarkt.pl/superliga/transfers/wettbewerb/AR1N/plus/?saison_id=2019&s_w=&leihe=1&intern=0&intern=1',
     'https://www.transfermarkt.pl/major-league-soccer/transfers/wettbewerb/MLS1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1'
+    'https://www.transfermarkt.pl/scottish-premiership/transfers/wettbewerb/SC1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-liga-srbije/transfers/wettbewerb/SER1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/premier-liha/transfers/wettbewerb/UKR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/jupiler-pro-league/transfers/wettbewerb/BE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-league/transfers/wettbewerb/C1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-lig/transfers/wettbewerb/TR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/chinese-super-league/transfers/wettbewerb/CSL/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/qatar-stars-league/transfers/wettbewerb/QSL/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1'
 ]
 
-file_names = ["transfers-file-"+site[site.find('.pl')+4:site.find('/transfers')]+".html" for site in transfers_sites_list]
+file_names = ["html/transfers-file-"+site[site.find('.pl')+4:site.find('/transfers')]+".html" for site in transfers_sites_list]
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
 }
@@ -31,7 +39,7 @@ headers = {
 for index, site in enumerate(transfers_sites_list):
     webpage = requests.get(site, headers=headers)
     file_name = file_names[index]
-    file = open(file_name, "w+")
+    file = open(file_name, "w+", encoding="utf-8")
     file_names.append(file_name)
     file.write(webpage.text)
     file.close()
@@ -63,7 +71,7 @@ def get_club_info(club_href):
 
 
 def gather_info_from_file(file_name):
-    file = open(file_name, "r")
+    file = open(file_name, "r", encoding="utf-8")
     file_content = file.read()
     file.close()
     soup = BeautifulSoup(file_content, 'html.parser')
