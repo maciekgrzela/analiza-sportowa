@@ -2,54 +2,55 @@ import requests
 import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
+import progressbar as pb
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 320)
 
 transfers_sites_list = [
     'https://www.transfermarkt.pl/pko-ekstraklasa/transfers/wettbewerb/PL1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/premier-league/transfers/wettbewerb/GB1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/laliga/transfers/wettbewerb/ES1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/bundesliga/transfers/wettbewerb/L1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/serie-a/transfers/wettbewerb/IT1/plus/?saison_id=2020&s_w=&leihe=3&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/ligue-1/transfers/wettbewerb/FR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/premier-liga/transfers/wettbewerb/RU1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/bundesliga/transfers/wettbewerb/A1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/campeonato-brasileiro-serie-a/transfers/wettbewerb/BRA1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/eredivisie/transfers/wettbewerb/NL1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/liga-portugal-bwin/transfers/wettbewerb/PO1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/superliga/transfers/wettbewerb/AR1N/plus/?saison_id=2019&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/major-league-soccer/transfers/wettbewerb/MLS1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1'
-    # 'https://www.transfermarkt.pl/scottish-premiership/transfers/wettbewerb/SC1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/super-liga-srbije/transfers/wettbewerb/SER1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/premier-liha/transfers/wettbewerb/UKR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/jupiler-pro-league/transfers/wettbewerb/BE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/super-league/transfers/wettbewerb/C1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/super-lig/transfers/wettbewerb/TR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/chinese-super-league/transfers/wettbewerb/CSL/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/qatar-stars-league/transfers/wettbewerb/QSL/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/super-league-1/transfers/wettbewerb/GR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/1-hnl/transfers/wettbewerb/KR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/superligaen/transfers/wettbewerb/DK1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/fortuna-liga/transfers/wettbewerb/TS1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/protathlima-cyta/transfers/wettbewerb/ZYP1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/eliteserien/transfers/wettbewerb/NO1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/ligat-haal/transfers/wettbewerb/ISR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/allsvenskan/transfers/wettbewerb/SE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/efbet-liga/transfers/wettbewerb/BU1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/championship/transfers/wettbewerb/GB2/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/league-one/transfers/wettbewerb/GB3/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/nemzeti-bajnoksag/transfers/wettbewerb/UNG1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/nemzeti-bajnoksag/transfers/wettbewerb/FI1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/liga-mx-clausura/transfers/wettbewerb/MEX1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/saudi-professional-league/transfers/wettbewerb/SA1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/j1-league/transfers/wettbewerb/JAP1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/uae-pro-league/transfers/wettbewerb/UAE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/liga-dimayor-ii/transfers/wettbewerb/COL1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
-    # 'https://www.transfermarkt.pl/egyptian-premier-league/transfers/wettbewerb/EGY1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1'
+    'https://www.transfermarkt.pl/premier-league/transfers/wettbewerb/GB1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/laliga/transfers/wettbewerb/ES1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/bundesliga/transfers/wettbewerb/L1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/serie-a/transfers/wettbewerb/IT1/plus/?saison_id=2020&s_w=&leihe=3&intern=0&intern=1',
+    'https://www.transfermarkt.pl/ligue-1/transfers/wettbewerb/FR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/premier-liga/transfers/wettbewerb/RU1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/bundesliga/transfers/wettbewerb/A1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/campeonato-brasileiro-serie-a/transfers/wettbewerb/BRA1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/eredivisie/transfers/wettbewerb/NL1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/liga-portugal-bwin/transfers/wettbewerb/PO1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/superliga/transfers/wettbewerb/AR1N/plus/?saison_id=2019&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/major-league-soccer/transfers/wettbewerb/MLS1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1'
+    'https://www.transfermarkt.pl/scottish-premiership/transfers/wettbewerb/SC1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-liga-srbije/transfers/wettbewerb/SER1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/premier-liha/transfers/wettbewerb/UKR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/jupiler-pro-league/transfers/wettbewerb/BE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-league/transfers/wettbewerb/C1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-lig/transfers/wettbewerb/TR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/chinese-super-league/transfers/wettbewerb/CSL/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/qatar-stars-league/transfers/wettbewerb/QSL/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/super-league-1/transfers/wettbewerb/GR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/1-hnl/transfers/wettbewerb/KR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/superligaen/transfers/wettbewerb/DK1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/fortuna-liga/transfers/wettbewerb/TS1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/protathlima-cyta/transfers/wettbewerb/ZYP1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/eliteserien/transfers/wettbewerb/NO1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/ligat-haal/transfers/wettbewerb/ISR1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/allsvenskan/transfers/wettbewerb/SE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/efbet-liga/transfers/wettbewerb/BU1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/championship/transfers/wettbewerb/GB2/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/league-one/transfers/wettbewerb/GB3/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/nemzeti-bajnoksag/transfers/wettbewerb/UNG1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/nemzeti-bajnoksag/transfers/wettbewerb/FI1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/liga-mx-clausura/transfers/wettbewerb/MEX1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/saudi-professional-league/transfers/wettbewerb/SA1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/j1-league/transfers/wettbewerb/JAP1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/uae-pro-league/transfers/wettbewerb/UAE1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/liga-dimayor-ii/transfers/wettbewerb/COL1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1',
+    'https://www.transfermarkt.pl/egyptian-premier-league/transfers/wettbewerb/EGY1/plus/?saison_id=2020&s_w=&leihe=1&intern=0&intern=1'
 ]
 
-file_names = ["html/transfers-file-"+site[site.find('.pl')+4:site.find('/transfers')]+".html" for site in transfers_sites_list]
+file_names = ["html/transfers-file-"+site[site.find('.pl')+4:site.find('/transfers')]+site[site.find('werb')+5:site.find('/plus')]+".html" for site in transfers_sites_list]
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
 }
@@ -191,7 +192,6 @@ def flatten_list(list_to_flat):
 
 for index, name in enumerate(file_names):
     transfers.append(gather_info_from_file(name))
-
 
 transfers = flatten_list(flatten_list(transfers))
 transfers_df = pd.DataFrame(transfers, columns=transfers_columns)
